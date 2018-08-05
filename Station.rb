@@ -30,9 +30,7 @@ class Station
 
     # return by type
     else
-      @trains.map do |train|
-        train if train.type == type.to_s
-      end
+      @trains.select { |train| train if train.type == type.to_s }
     end
   end
 
@@ -47,7 +45,7 @@ class Station
 
       # return by type
       else
-        @trains.map { |train| train if train.type == type.to_s }.compact.size
+        @trains.select { |train| train if train.type == type.to_s }.size
       end
     end
   end

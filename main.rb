@@ -33,6 +33,7 @@ MENU_TEXT
 stations  = []
 trains    = []
 routes    = []
+cars      = []
 
 while choise != 'stop' do
   puts menu_text
@@ -72,8 +73,8 @@ while choise != 'stop' do
     print 'Enter end station name (from existing stations): '
     name_2 = gets.chomp
 
-    st_1 = stations.map { |st| st if st.name == name_1 }.compact.first
-    st_2 = stations.map { |st| st if st.name == name_2 }.compact.first
+    st_1 = stations.select { |st| st if st.name == name_1 }.first
+    st_2 = stations.select { |st| st if st.name == name_2 }.first
 
     if st_1 && st_2 
       routes << Route.new(st_1, st_2)
@@ -88,12 +89,12 @@ while choise != 'stop' do
     print 'Enter end station name (last station of route): '
     name_2 = gets.chomp
 
-    route = routes.map { |r| r if r.st_begin.name == name_1 && r.st_end.name == name_2 }.compact.first
+    route = routes.select { |r| r if r.st_begin.name == name_1 && r.st_end.name == name_2 }.first
     if route
       print 'Enter station name to add (from existing): '
       name_3 = gets.chomp
 
-      station = stations.map { |s| s if s.name == name_3 }.compact.first
+      station = stations.select { |s| s if s.name == name_3 }.first
       if station
         route.add_station station
         puts 'Station was added to route'
@@ -110,12 +111,12 @@ while choise != 'stop' do
     print 'Enter end station name (last station of route): '
     name_2 = gets.chomp
 
-    route = routes.map { |r| r if r.st_begin.name == name_1 && r.st_end.name == name_2 }.compact.first
+    route = routes.select { |r| r if r.st_begin.name == name_1 && r.st_end.name == name_2 }.first
     if route
       print 'Enter station name to remove (from existing in route list): '
       name_3 = gets.chomp
 
-      station = route.intermediate.map { |s| s if s.name == name_3 }.compact.first
+      station = route.intermediate.select { |s| s if s.name == name_3 }.first
       if station
         route.delete_station(name_3)
         puts 'Station was removed from route'
@@ -130,14 +131,14 @@ while choise != 'stop' do
     print 'Enter train number for setting route: '
     number = gets.chomp
 
-    train = trains.map { |t| t if t.number == number }.compact.first
+    train = trains.select { |t| t if t.number == number }.first
     if train
       print 'Enter begin station name (first station of route): '
       name_1 = gets.chomp
       print 'Enter end station name (last station of route): '
       name_2 = gets.chomp
 
-      route = routes.map { |r| r if r.st_begin.name == name_1 && r.st_end.name == name_2 }.compact.first
+      route = routes.select { |r| r if r.st_begin.name == name_1 && r.st_end.name == name_2 }.first
       if route
         train.route = route
         puts 'Route entered.'
@@ -152,9 +153,10 @@ while choise != 'stop' do
     print 'Enter train number to add cars: '
     number = gets.chomp
 
-    train = trains.map { |t| t if t.number == number }.compact.first
+    train = trains.select { |t| t if t.number == number }.first
     if train
-      train.type == 'pass' ? train.car_connect(PassengerCar.new) : train.car_connect(CargoCar.new)
+      train.type == 'pass' ? train.car_connect(c = PassengerCar.new) : train.car_connect(c = CargoCar.new)
+      cars << c
       puts 'Car added.'
     else
       puts 'Train not found.'
@@ -164,7 +166,7 @@ while choise != 'stop' do
     print 'Enter train number to remove cars: '
     number = gets.chomp
 
-    train = trains.map { |t| t if t.number == number }.compact.first
+    train = trains.select { |t| t if t.number == number }.first
     if train
       if train.cars_count == 0
         puts 'Can not to remove cars: cars count is zero.'
@@ -180,7 +182,7 @@ while choise != 'stop' do
     print 'Enter train number to move next station: '
     number = gets.chomp
 
-    train = trains.map { |t| t if t.number == number }.compact.first
+    train = trains.select { |t| t if t.number == number }.first
     if train
       if train.route
         train.go_to_next_st
@@ -196,7 +198,7 @@ while choise != 'stop' do
     print 'Enter train number to move next station: '
     number = gets.chomp
 
-    train = trains.map { |t| t if t.number == number }.compact.first
+    train = trains.select { |t| t if t.number == number }.first
     if train
       if train.route
         train.go_to_prev_st
@@ -239,7 +241,7 @@ while choise != 'stop' do
     print 'Enter train number to set company name: '
     number = gets.chomp
 
-    train = trains.map { |t| t if t.number == number }.compact.first
+    train = trains.select { |t| t if t.number == number }.first
     if train
       print 'Enter company name: '
       c_name = gets.to_s
@@ -256,7 +258,7 @@ while choise != 'stop' do
     print 'Enter train number: '
     number = gets.chomp
 
-    train = trains.map { |t| t if t.number == number }.compact.first
+    train = trains.select { |t| t if t.number == number }.first
     if train.nil?
       puts 'Train not found.'
     else
@@ -273,8 +275,11 @@ while choise != 'stop' do
     end
 
   when '17'
-    #puts "-#{Train.instances}/#{Station.instances}/#{Route.instances}-"
-    puts "-#{Station.instances}-" 
+    puts "-#{Train.instances}/#{Station.instances}/#{Route.instances}-"
+
+  when '18'
+    puts cars.map { |c| "#{c.object_id.to_s.rjust(15, ' ')}  #{c.status}" }
+
   else
 
   end

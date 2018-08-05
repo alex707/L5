@@ -5,7 +5,7 @@ class Train
 
   attr_reader :route, :speed, :number, :type
 
-  @@all = []
+  @@all = {}
 
   def initialize(number, type)
     @number     = number
@@ -16,7 +16,7 @@ class Train
     @st_number  = nil
     @route      = nil
     @cars       = []
-    @@all << self
+    @@all[number] = self
 
     register_instance
   end
@@ -69,11 +69,11 @@ class Train
   end
 
   def car_disconnect
-    @cars.delete_at(-1)
+    @cars.delete_at(-1).status = false
   end 
 
   def find(number)
-    @@all.map { |t| t.number == number }.compact.first
+    @@all[number]
   end
 end
 
